@@ -1,4 +1,6 @@
-import config
+# DiscordBot_temp.py : 디스코드 봇 명령어 모음 / 봇 네이밍 후 파일명 변경
+
+import config as config
 import discord
 import discord.message
 from discord.ext import commands
@@ -55,5 +57,5 @@ async def auc_distribution(ctx, gold: int) -> None:
     """
     
 
-bot.run(TOKEN)
+bot.run(DISCORD_TOKEN)
 
