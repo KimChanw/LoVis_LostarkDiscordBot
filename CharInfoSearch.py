@@ -20,5 +20,23 @@ class CharInfoSearch(InfoBaseLine):
         
         # json 포맷으로 변환
         return res.json()
+    
+    def siblingsInfo(self):
+        url = CharInfoSearch.BASIC_URL + f'/characters/{self.char_name}/siblings'
+        res = requests.get(url, headers=CharInfoSearch.HEADERS)
+        json_res = res.json()
+        
+        # 캐릭터 아이템 레벨 기준 json 정렬
+        # 레벨 형식 : 1,470.00 -> 문자열로 저장되어 있으므로 float 전환
+        # float 전환 위해 해당 값에서 ','을 제거
+        json_res.sort(key=lambda x: float(x['ItemMaxLevel'].replace(',', '')), 
+                      reverse=True)
+        
+        return json_res
+        
+    def skillInfo(self):
+        # 정식 사이트 크롤링으로 채택 스킬 구현 필요
+        pass
+    
 
 
