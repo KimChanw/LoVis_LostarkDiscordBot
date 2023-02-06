@@ -72,8 +72,10 @@ async def siblings(ctx, char_name):
     embed.add_field(name='직업', value='', inline=True)
     embed.add_field(name='아이템 레벨', value='', inline=True)
     
-    # 레벨 기준 최대 6개까지 출력함
-    for idx in range(6):
+    # 레벨 기준으로 정렬하여 최대 6개까지 출력
+    # 캐릭터 개수가 6개 이하라면 가지고 있는 부캐 개수만큼 출력
+    barraks_cnt = min(len(siblingsInfo), 6)
+    for idx in range(barraks_cnt):
         _info = siblingsInfo[idx]
         _name = _info['CharacterName']
         _class = _info['CharacterClassName']
