@@ -60,6 +60,11 @@ async def siblings(ctx, char_name):
     search = CharInfoSearch(char_name)
     siblingsInfo = search.siblingsInfo()
     
+    # 캐릭터가 존재하지 않을 시 오류 메시지 반환하고 메소드 종료
+    if siblingsInfo == None:
+        await ctx.send(f' {ctx.author.mention} 존재하지 않는 닉네임 입니다.')
+        return
+    
     embed = discord.Embed(title=f'{char_name} 캐릭터의 배럭 목록',
                           color=0XFFD700)
     
@@ -67,11 +72,10 @@ async def siblings(ctx, char_name):
     embed.add_field(name='직업', value='', inline=True)
     embed.add_field(name='아이템 레벨', value='', inline=True)
     
+    # 레벨 기준 최대 6개까지 출력함
     for idx in range(6):
         _info = siblingsInfo[idx]
-        _server = _info['ServerName']
         _name = _info['CharacterName']
-        _level = _info['CharacterLevel']
         _class = _info['CharacterClassName']
         _itemLevel = _info['ItemMaxLevel']
 
@@ -79,7 +83,7 @@ async def siblings(ctx, char_name):
         embed.add_field(name='', value=f'{_class}', inline=True)
         embed.add_field(name='', value=f'{_itemLevel}', inline=True)
         
-    await ctx.send(embed=embed)
+    await ctx.send(ctx.author.mention, embed=embed)
     
     
 #### 캐릭터 착용 장비
