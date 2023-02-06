@@ -11,20 +11,27 @@ class CharInfoSearch(InfoBaseLine):
     def __init__(self, char_name):
         self.char_name = char_name
     
+    # get 메소드로 호출하는 api
+    def getinfo(self, url):
+        # requests 라이브러리로 get
+        res = requests.get(url, headers=CharInfoSearch.HEADERS)
+        # json 포맷으로 변환
+        json_res = res.json()
+        
+        return json_res
+    
     # 단일 캐릭터 정보 검색
     def charInfo(self):
         # api 엔드포인트
         url = CharInfoSearch.BASIC_URL + f'/armories/characters/{self.char_name}/profiles'
-        # requests 라이브러리로 get
-        res = requests.get(url, headers=CharInfoSearch.HEADERS)
+        json_res = self.getinfo(url)
         
-        # json 포맷으로 변환
-        return res.json()
+        return json_res
     
     def siblingsInfo(self):
+        # api로 호출
         url = CharInfoSearch.BASIC_URL + f'/characters/{self.char_name}/siblings'
-        res = requests.get(url, headers=CharInfoSearch.HEADERS)
-        json_res = res.json()
+        json_res = self.getinfo(url)
         
         # 캐릭터 아이템 레벨 기준 json 정렬
         # 레벨 형식 : 1,470.00 -> 문자열로 저장되어 있으므로 float 전환
@@ -38,7 +45,12 @@ class CharInfoSearch(InfoBaseLine):
         # 캐릭터 정보가 존재하지 않으면 Nonetype 반환하여 sort 메소드가 없음
         except AttributeError:
             return
-            
+    
+    # 착용 각인 정보
+    def gravInfo(self):
+        url = CharInfoSearch.BASIC_URL + f'/characters/{self.char_name}/engravings'
+        json_res = self.getinfo(url)
+    
     def skillInfo(self):
         # 정식 사이트 크롤링으로 채택 스킬 구현 필요
         pass
