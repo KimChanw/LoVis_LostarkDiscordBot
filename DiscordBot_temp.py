@@ -7,8 +7,6 @@ from CharInfoSearch import CharInfoSearch
 from ItemInfoSearch import ItemInfoSearch
 from discord.ext import commands
 
-# 서버 메시지 인텐트 설정
-discord.Intents.message_content = True
 
 # 봇이 반응하는 접두사 : '/'
 # 예시) 디스코드 채널 /ping 입력 -> pong 메시지 반환
@@ -27,10 +25,10 @@ async def ping(ctx):
     await ctx.channel.send(f'pong! 퐁!')
 
 
-@bot.command(aliases=['정보','캐릭터','캐릭'])
-async def info(ctx, char_name: str) -> None:
+@bot.command(aliases=['정보','캐릭터','캐릭', '인포'])
+async def char_info(ctx, char_name: str) -> None:
     """
-    info : 단일 캐릭터 정보를 반환하는 커맨드
+    char_info : 단일 캐릭터 정보를 반환하는 커맨드
     예시) !정보 문학학사공학석사 / !캐릭터 문학학사공학석사
     """
     
@@ -45,11 +43,50 @@ async def info(ctx, char_name: str) -> None:
         await ctx.send(f' {ctx.author.mention} 존재하지 않는 닉네임 입니다.')
     
 # info 커맨드에서 캐릭터 이름이 빠질 시 에러 메시지 반환
-@info.error
-async def info_error(ctx, error):
+@char_info.error
+async def char_info_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send('올바른 닉네임 형식을 입력해주세요.')
 
+
+#### 캐릭터 배럭
+@bot.command(aliases=['배럭', '부캐'])
+async def siblings(ctx, char_name):
+    """
+    sibilings : 해당 캐릭터를 포함한 배럭 리스트
+    예시) !배럭 문학학사공학석사
+    문학학사공학석사 계정의 배럭을 레벨 순으로 출력
+    """
+    search = CharInfoSearch(char_name)
+    siblingsInfo = search.siblingsInfo()
+    
+    # 캐릭터가 존재하지 않을 시 오류 메시지 반환하고 메소드 종료
+    if siblingsInfo == None:
+        await ctx.send(f' {ctx.author.mention} 존재하지 않는 닉네임 입니다.')
+        return
+    
+    embed = discord.Embed(title=f'{char_name} 캐릭터의 배럭 목록',
+                          color=0XFFD700)
+    
+    embed.add_field(name='캐릭터명', value='', inline=True)
+    embed.add_field(name='직업', value='', inline=True)
+    embed.add_field(name='아이템 레벨', value='', inline=True)
+    
+    # 레벨 기준 최대 6개까지 출력함
+    for idx in range(6):
+        _info = siblingsInfo[idx]
+        _name = _info['CharacterName']
+        _class = _info['CharacterClassName']
+        _itemLevel = _info['ItemMaxLevel']
+
+        embed.add_field(name='', value=f'{_name}', inline=True)
+        embed.add_field(name='', value=f'{_class}', inline=True)
+        embed.add_field(name='', value=f'{_itemLevel}', inline=True)
+        
+    await ctx.send(ctx.author.mention, embed=embed)
+    
+    
+#### 캐릭터 착용 장비
 
 @bot.command(aliases=['경매','전각','배분', '분배'])
 async def auc_distribution(ctx, item_name: str) -> None:
@@ -81,7 +118,7 @@ async def auc_distribution(ctx, item_name: str) -> None:
     
     # 디스코드 메시지로 출력할 embed 형식
     embed = discord.Embed(title='전각 분배금 계산기',
-                          discription=f'**{official_name}**',
+                          discription=f'**{official_name}\n\n\n\n**',
                           color=0XFFD700)
     
     embed.add_field(name='경매장 최저가',
@@ -93,13 +130,13 @@ async def auc_distribution(ctx, item_name: str) -> None:
     embed.add_field(name='8인 파티',
                     value=f'입찰가 : {bid_8:.0f}\n선점입찰가 : {preempt_bid_8:.0f}')
     
-    await ctx.send(embed=embed)
+    await ctx.send(ctx.author.mention, embed=embed)
 
 # 아이템 이름이 누락될 시
 @auc_distribution.error
 async def auc_distribution_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send('올바른 아이템 이름 형식을 입력해주세요.')
+        await ctx.send(f' {ctx.author.mention} 올바른 아이템 이름 형식을 입력해주세요.')
 
 bot.run(DISCORD_TOKEN)
 
