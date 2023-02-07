@@ -1,10 +1,10 @@
 # DiscordBot_temp.py : 디스코드 봇 명령어 모음 / 봇 네이밍 후 파일명 변경
 
-import config as config
+import SearchTools.config as config
 import discord
 import discord.message
-from CharInfoSearch import CharInfoSearch
-from ItemInfoSearch import ItemInfoSearch
+from SearchTools.CharInfoSearch import CharInfoSearch
+from SearchTools.ItemInfoSearch import ItemInfoSearch
 from discord.ext import commands
 
 
