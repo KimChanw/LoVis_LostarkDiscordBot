@@ -1,4 +1,4 @@
-import config
+import SearchTools.config as config
 
 class InfoBaseLine:
     """
