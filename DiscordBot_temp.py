@@ -22,7 +22,7 @@ async def on_ready():
         
 @bot.command()
 async def ping(ctx):
-    await ctx.channel.send(f'pong! 퐁!')
+    await ctx.channel.send(f'pong!')
 
 
 @bot.command(aliases=['정보','캐릭터','캐릭', '인포'])
@@ -37,10 +37,10 @@ async def char_info(ctx, char_name: str) -> None:
     charInfo = search.charInfo()
     
     if charInfo:    # 검색 결과가 존재함
-        await ctx.send(f' {ctx.author.mention} {charInfo["CharacterName"]}, {charInfo["CharacterClassName"]}, {charInfo["ItemAvgLevel"]}')
+        await ctx.send(f'{ctx.author.mention} {charInfo["CharacterName"]}, {charInfo["CharacterClassName"]}, {charInfo["ItemAvgLevel"]}')
     
     else:
-        await ctx.send(f' {ctx.author.mention} 존재하지 않는 닉네임 입니다.')
+        await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
     
 # info 커맨드에서 캐릭터 이름이 빠질 시 에러 메시지 반환
 @char_info.error
@@ -48,6 +48,22 @@ async def char_info_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send('올바른 닉네임 형식을 입력해주세요.')
 
+@bot.command(aliases=['각인'])
+async def engrav_info(ctx, char_name):
+    search = CharInfoSearch(char_name)
+    engInfo = search.engravInfo()
+    
+    if engInfo == None:
+        await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
+        return
+
+    embed = discord.Embed(title=f'> {char_name} 캐릭터의 장착 각인', color=0XFFD700)
+    
+    for idx in range(len(engInfo)):
+        engrav_name = engInfo[idx]['Name']
+        embed.add_field(name='', value=f'{engrav_name}', inline=False)
+    
+    await ctx.send(ctx.author.mention, embed=embed)
 
 #### 캐릭터 배럭
 @bot.command(aliases=['배럭', '부캐'])
@@ -65,12 +81,12 @@ async def siblings(ctx, char_name):
         await ctx.send(f' {ctx.author.mention} 존재하지 않는 닉네임 입니다.')
         return
     
-    embed = discord.Embed(title=f'{char_name} 캐릭터의 배럭 목록',
+    embed = discord.Embed(title=f'> {char_name} 캐릭터의 배럭 목록',
                           color=0XFFD700)
     
-    embed.add_field(name='캐릭터명', value='', inline=True)
-    embed.add_field(name='직업', value='', inline=True)
-    embed.add_field(name='아이템 레벨', value='', inline=True)
+    embed.add_field(name='`캐릭터명`', value='', inline=True)
+    embed.add_field(name='`직업`', value='', inline=True)
+    embed.add_field(name='`아이템 레벨`', value='', inline=True)
     
     # 레벨 기준으로 정렬하여 최대 6개까지 출력
     # 캐릭터 개수가 6개 이하라면 가지고 있는 부캐 개수만큼 출력
