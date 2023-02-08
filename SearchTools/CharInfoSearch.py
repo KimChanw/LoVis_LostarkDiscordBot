@@ -47,9 +47,20 @@ class CharInfoSearch(InfoBaseLine):
             return
     
     # 착용 각인 정보
-    def gravInfo(self):
-        url = CharInfoSearch.BASIC_URL + f'/characters/{self.char_name}/engravings'
+    def engravInfo(self):
+        url = CharInfoSearch.BASIC_URL + f'/armories/characters/{self.char_name}/engravings'
         json_res = self.getinfo(url)
+        
+        try:
+            return json_res['Effects']
+        
+        except AttributeError:
+            return
+    
+    # 보석 착용 정보
+    def gemInfo(self):
+        # (?<=<FONT COLOR='#FFD200'>)\W+(?=<\/FONT>) : 보석 스킬 정보 추출할 정규표현식
+        pass
     
     def skillInfo(self):
         # 정식 사이트 크롤링으로 채택 스킬 구현 필요
