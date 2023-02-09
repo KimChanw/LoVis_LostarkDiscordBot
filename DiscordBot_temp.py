@@ -3,10 +3,10 @@
 import SearchTools.config as config
 import discord
 import discord.message
+from SearchTools.classIcon import classIcon as classIcon
 from SearchTools.CharInfoSearch import CharInfoSearch
 from SearchTools.ItemInfoSearch import ItemInfoSearch
 from discord.ext import commands
-
 
 # 봇이 반응하는 접두사 : '/'
 # 예시) 디스코드 채널 /ping 입력 -> pong 메시지 반환
@@ -15,11 +15,13 @@ bot = commands.Bot(command_prefix='/')
 # 디스코드 봇 개발 API
 DISCORD_TOKEN = config.discord_api
 
+# 봇이 작동되면 온라인으로 상태 전환
 @bot.event
 async def on_ready():
     print('Done!')
     await bot.change_presence(status=discord.Status.online, activity=None)
-        
+
+# 테스트 명령어
 @bot.command()
 async def ping(ctx):
     await ctx.channel.send(f'pong!')
@@ -36,11 +38,14 @@ async def char_info(ctx, char_name: str) -> None:
     search = CharInfoSearch(char_name)
     charInfo = search.charInfo()
     
-    if charInfo:    # 검색 결과가 존재함
-        await ctx.send(f'{ctx.author.mention} {charInfo["CharacterName"]}, {charInfo["CharacterClassName"]}, {charInfo["ItemAvgLevel"]}')
+    class_name = charInfo['CharacterClassName']
     
-    else:
-        await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
+    embed = discord.Embed(title='', color=0XFFD700)
+    embed.set_author(name=f'{char_name} 캐릭터 정보', icon_url=classIcon[class_name])
+    
+    embed.add_field(name='정보', value='그냥')
+    
+    await ctx.send(ctx.author.mention, embed=embed)
     
 # info 커맨드에서 캐릭터 이름이 빠질 시 에러 메시지 반환
 @char_info.error
@@ -65,9 +70,14 @@ async def engrav_info(ctx, char_name):
     
     await ctx.send(ctx.author.mention, embed=embed)
 
+@engrav_info.error
+async def engrav_info_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send('올바른 닉네임 형식을 입력해주세요.')
+
 #### 캐릭터 배럭
 @bot.command(aliases=['배럭', '부캐'])
-async def siblings(ctx, char_name):
+async def siblings_info(ctx, char_name):
     """
     sibilings : 해당 캐릭터를 포함한 배럭 리스트
     예시) !배럭 문학학사공학석사
@@ -78,7 +88,7 @@ async def siblings(ctx, char_name):
     
     # 캐릭터가 존재하지 않을 시 오류 메시지 반환하고 메소드 종료
     if siblingsInfo == None:
-        await ctx.send(f' {ctx.author.mention} 존재하지 않는 닉네임 입니다.')
+        await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
         return
     
     embed = discord.Embed(title=f'> {char_name} 캐릭터의 배럭 목록',
@@ -103,7 +113,11 @@ async def siblings(ctx, char_name):
         
     await ctx.send(ctx.author.mention, embed=embed)
     
-    
+@siblings_info.error
+async def sibilings_info_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send('올바른 닉네임 형식을 입력해주세요.')
+
 #### 캐릭터 착용 장비
 
 @bot.command(aliases=['경매','전각','배분', '분배'])
@@ -123,6 +137,7 @@ async def auc_distribution(ctx, item_name: str) -> None:
         # 정식 아이템 이름 / 경매장 기준 최근 판매값
         official_name = itemInfo["Items"][-1]["Name"]
         recent_price = itemInfo["Items"][-1]["RecentPrice"]
+        image_url = itemInfo["Items"][-1]["Icon"]
         
     except IndexError:
         await ctx.send("존재하지 않는 아이템 입니다.")
@@ -135,14 +150,20 @@ async def auc_distribution(ctx, item_name: str) -> None:
     preempt_bid_8 = recent_price * 0.95 * 10/11 * 7/8
     
     # 디스코드 메시지로 출력할 embed 형식
-    embed = discord.Embed(title='전각 분배금 계산기',
-                          discription=f'**{official_name}\n\n\n\n**',
+    embed = discord.Embed(title='',
+                          discription='',
                           color=0XFFD700)
     
+    embed.set_author(name='전각 분배금 계산기', icon_url=image_url)
+    
+    # 아이템 이름 필드
+    embed.add_field(name='아이템 이름', value=f'{official_name}', inline=False)
+    
+    # 최저가 필드
     embed.add_field(name='경매장 최저가',
                     value=f'{recent_price}\n\n\n\n', inline=False)
     
-    # 소수점 제한하여 출력
+    # 분배금 필드, 소수점 제한하여 출력
     embed.add_field(name='4인 파티',
                     value=f'입찰가 : {bid_4:.0f}\n선점입찰가 : {preempt_bid_4:.0f}\n\n\n\n', inline=False)
     embed.add_field(name='8인 파티',
