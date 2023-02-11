@@ -62,13 +62,18 @@ class CharInfoSearch(InfoBaseLine):
             return
     
     # 보석 착용 정보
-    def gemInfo(self):
-        # (?<=<FONT COLOR='#FFD200'>)\W+(?=<\/FONT>) : 보석 스킬 정보 추출할 정규표현식
-        pass
+    def gemsInfo(self):
+        
+        url = CharInfoSearch.BASIC_URL + f'/armories/characters/{self.char_name}/gems'
+        json_res = self.__getinfo(url)
+        
+        try:
+            return json_res['Gems']
+        
+        except AttributeError:
+            return
     
-    def skillInfo(self):
-        # 정식 사이트 크롤링으로 채택 스킬 구현 필요
-        pass
+
     
 
 

@@ -3,10 +3,14 @@
 import SearchTools.config as config
 import discord
 import discord.message
+
+from discord.ext import commands
+
 from SearchTools.classIcon import classIcon as classIcon
 from SearchTools.CharInfoSearch import CharInfoSearch
 from SearchTools.ItemInfoSearch import ItemInfoSearch
-from discord.ext import commands
+
+from ExtractTools.GemsExtract import gemsExtract
 
 # 봇이 반응하는 접두사 : '/'
 # 예시) 디스코드 채널 /ping 입력 -> pong 메시지 반환
@@ -31,7 +35,8 @@ async def ping(ctx):
 async def char_info(ctx, char_name: str) -> None:
     """
     char_info : 단일 캐릭터 정보를 반환하는 커맨드
-    예시) !정보 문학학사공학석사 / !캐릭터 문학학사공학석사
+    예시) /정보 문학학사공학석사 / /캐릭터 문학학사공학석사
+    결과) 
     """
     
     # 캐릭터 검색 객체 호출 -> 개별 캐릭터를 검색하는 메소드 (charInfo)
@@ -41,7 +46,7 @@ async def char_info(ctx, char_name: str) -> None:
     class_name = charInfo['CharacterClassName']
     
     embed = discord.Embed(title='', color=0XFFD700)
-    embed.set_author(name=f'{char_name} 캐릭터 정보', icon_url=classIcon[class_name])
+    embed.set_author(name=f'{char_name}', icon_url=classIcon[class_name])
     
     embed.add_field(name='정보', value='그냥')
     
@@ -64,9 +69,10 @@ async def engrav_info(ctx, char_name):
 
     embed = discord.Embed(title=f'> {char_name} 캐릭터의 장착 각인', color=0XFFD700)
     
+    # 장착한 각인 데이터 순회 -> 각인 이름 출력
     for idx in range(len(engInfo)):
-        engrav_name = engInfo[idx]['Name']
-        embed.add_field(name='', value=f'{engrav_name}', inline=False)
+        _engrav_name = engInfo[idx]['Name']
+        embed.add_field(name='', value=f'{_engrav_name}', inline=False)
     
     await ctx.send(ctx.author.mention, embed=embed)
 
@@ -79,9 +85,9 @@ async def engrav_info_error(ctx, error):
 @bot.command(aliases=['배럭', '부캐'])
 async def siblings_info(ctx, char_name):
     """
-    sibilings : 해당 캐릭터를 포함한 배럭 리스트
-    예시) !배럭 문학학사공학석사
-    문학학사공학석사 계정의 배럭을 레벨 순으로 출력
+    siblings_info : 해당 캐릭터를 포함한 배럭 리스트
+    예시) /배럭 문학학사공학석사
+    결과) 문학학사공학석사 계정에 생성된 캐릭터를 레벨 순으로 출력
     """
     search = CharInfoSearch(char_name)
     siblingsInfo = search.siblingsInfo()
@@ -91,14 +97,13 @@ async def siblings_info(ctx, char_name):
         await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
         return
     
-    embed = discord.Embed(title=f'> {char_name} 캐릭터의 배럭 목록',
+    embed = discord.Embed(title=f'{char_name} 캐릭터 배럭 목록',
                           color=0XFFD700)
     
-    embed.add_field(name='`캐릭터명`', value='', inline=True)
-    embed.add_field(name='`직업`', value='', inline=True)
-    embed.add_field(name='`아이템 레벨`', value='', inline=True)
+    embed.add_field(name='캐릭터명', value='', inline=True)
+    embed.add_field(name='직업', value='', inline=True)
+    embed.add_field(name='아이템 레벨', value='', inline=True)
     
-    # 레벨 기준으로 정렬하여 최대 6개까지 출력
     # 캐릭터 개수가 6개 이하라면 가지고 있는 부캐 개수만큼 출력
     barraks_cnt = min(len(siblingsInfo), 6)
     for idx in range(barraks_cnt):
@@ -118,17 +123,65 @@ async def sibilings_info_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send('올바른 닉네임 형식을 입력해주세요.')
 
-#### 캐릭터 착용 장비
+#### 캐릭터 착용 보석
+@bot.command(aliases=['보석'])
+async def gems_info(ctx, char_name):
+    """
+    gems_info : 캐릭터가 장착하고 있는 보석 목록 출력
+    예시) /보석 문학학사공학석사
+    """
+    
+    search = CharInfoSearch(char_name)
+    gemsInfo = search.gemsInfo()
+    
+    if gemsInfo == None:
+        await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
+        return
+    
+    embed = discord.Embed(title='')
+    embed.set_author(name=f'{char_name} 캐릭터 보석', 
+                     icon_url='https://cdn-lostark.game.onstove.com/EFUI_IconAtlas/Use/Use_9_55.png')
+    
+    
+    # 코드 블록 형태로 출력
+    gem_messages = """```"""
+    skill_messages = """```"""
+    
+    # 보석 레벨 순 정렬 위해 리스트에 추가
+    gem_info_list = []
+    for gem_data in gemsInfo:
+        # (7레벨 홍염의 보석, [워로드] 차지 스팅어)
+        _gem_info = gemsExtract(gem_data)
+        gem_info_list.append(_gem_info)
+    
+    # 레벨 기준 내림차순 정렬
+    gem_info_list.sort(key=lambda x: x[2], reverse=True)
+    
+    # 코드 블록에 출력 메시지 추가
+    for gem_info in gem_info_list:
+        gem_messages += gem_info[0] + '\n\n'
+        skill_messages += gem_info[1] + '\n\n'
+    
+    # 코드 블록 close
+    gem_messages += '```'
+    skill_messages += '```'
+    
+    # 코드 블록으로 embed 출력
+    embed.add_field(name='보석', value=gem_messages, inline=True)
+    embed.add_field(name='스킬', value=skill_messages, inline=True)
+    
+    await ctx.send(ctx.author.mention, embed=embed)
+    
 
 @bot.command(aliases=['경매','전각','배분', '분배'])
 async def auc_distribution(ctx, item_name: str) -> None:
     """
     auc_distribution : 전각 분배 계산기
     예시) !경매 광기 / !전각 고독한 기사
-    입찰가와 선점입찰가를 embed 형식으로 출력
+    결과) 입찰가와 선점입찰가를 embed 형식으로 출력
     """
     
-    # 아이템 검색 객체 호출 -> 각인서 아이템 가격 검색 메소드 (engravingBookPrice)
+    # 아이템 검색 객체 호출
     item_search = ItemInfoSearch(item_name)
     itemInfo = item_search.engravingBookPrice()
     
