@@ -9,6 +9,7 @@ from discord.ext import commands
 from SearchTools.classIcon import classIcon as classIcon
 from SearchTools.CharInfoSearch import CharInfoSearch
 from SearchTools.ItemInfoSearch import ItemInfoSearch
+from SearchTools.TroubleSearch import TroubleSearch
 
 from ExtractTools.GemsExtract import gemsExtract
 
@@ -67,7 +68,7 @@ async def engrav_info(ctx, char_name):
         await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
         return
 
-    embed = discord.Embed(title=f'> {char_name} 캐릭터의 장착 각인', color=0XFFD700)
+    embed = discord.Embed(title=f'{char_name} 캐릭터의 장착 각인', color=0XFFD700)
     
     # 장착한 각인 데이터 순회 -> 각인 이름 출력
     for idx in range(len(engInfo)):
@@ -171,7 +172,12 @@ async def gems_info(ctx, char_name):
     embed.add_field(name='스킬', value=skill_messages, inline=True)
     
     await ctx.send(ctx.author.mention, embed=embed)
-    
+
+@gems_info.error
+async def gems_info_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send('올바른 닉네임 형식을 입력해주세요.')
+
 
 @bot.command(aliases=['경매','전각','배분', '분배'])
 async def auc_distribution(ctx, item_name: str) -> None:
@@ -230,5 +236,18 @@ async def auc_distribution_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(f' {ctx.author.mention} 올바른 아이템 이름 형식을 입력해주세요.')
 
+@bot.command(aliases=['사사게', '사고', '사건'])
+async def trouble_info(ctx, char_name):
+    trouble_search = TroubleSearch(char_name)
+    troubleInfo = trouble_search.searchTrouble()
+    
+    embed = discord.Embed(title=f':exclamation: 사사게 검색 결과 - {char_name}', discription='')
+    
+    for idx, (url, title) in enumerate(troubleInfo):
+        idx += 1
+        embed.add_field(name='', value=f'{idx}. [{title}](<{url}>)', inline=False)
+    
+    await ctx.send(ctx.author.mention, embed=embed)
+    
 bot.run(DISCORD_TOKEN)
 
