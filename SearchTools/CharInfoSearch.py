@@ -73,7 +73,13 @@ class CharInfoSearch(InfoBaseLine):
         except AttributeError:
             return
     
+    def cardInfo(self):
+        url = CharInfoSearch.BASIC_URL + f'/armories/characters/{self.char_name}/cards'
+        json_res = self.__getinfo(url)
+        
+        try:
+            return json_res['Effects'][0]['Items']
 
-    
-
+        except:
+            return
 

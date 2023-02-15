@@ -5,7 +5,7 @@ def gemsExtract(gems_json):
     gems_json : api로 받은 보석 json 데이터
     
     return : 
-    가공 데이터 : 보석 이름 / 보석 등급 별 색 / 스킬명 dict가 저장된 리스트
+    보석 이름 / 보석 적용 스킬명 / 스킬명 dict가 저장된 튜플
     """
 
     # 추출 과정 : RegEx를 이용하여 pattern 정의 -> 문자열에서 matching
