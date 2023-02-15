@@ -12,6 +12,7 @@ from SearchTools.ItemInfoSearch import ItemInfoSearch
 from SearchTools.TroubleSearch import TroubleSearch
 
 from ExtractTools.GemsExtract import gemsExtract
+from ExtractTools.CardExtract import cardExtract
 
 # 봇이 반응하는 접두사 : '/'
 # 예시) 디스코드 채널 /ping 입력 -> pong 메시지 반환
@@ -140,7 +141,7 @@ async def gems_info(ctx, char_name):
         return
     
     embed = discord.Embed(title='')
-    embed.set_author(name=f'{char_name} 캐릭터 보석', 
+    embed.set_author(name=f'{char_name} 캐릭터 보석 정보', 
                      icon_url='https://cdn-lostark.game.onstove.com/EFUI_IconAtlas/Use/Use_9_55.png')
     
     
@@ -238,16 +239,39 @@ async def auc_distribution_error(ctx, error):
 
 @bot.command(aliases=['사사게', '사고', '사건'])
 async def trouble_info(ctx, char_name):
+    # 사사게 검색 클래스 호출 후 결과 탐색
     trouble_search = TroubleSearch(char_name)
     troubleInfo = trouble_search.searchTrouble()
     
     embed = discord.Embed(title=f':exclamation: 사사게 검색 결과 - {char_name}', discription='')
     
+    # 인덱스와 검색 결과 같이 출력
     for idx, (url, title) in enumerate(troubleInfo):
         idx += 1
         embed.add_field(name='', value=f'{idx}. [{title}](<{url}>)', inline=False)
     
     await ctx.send(ctx.author.mention, embed=embed)
+
+@bot.command(aliases=['카드'])
+async def cards_info(ctx, char_name):
+    cards_search = CharInfoSearch(char_name)
+    cardsInfo = cards_search.cardInfo()
     
+    if cardsInfo == None:
+        await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
+        return
+    
+    embed = discord.Embed(title='', discription='')
+    embed.set_author(name=f'{char_name} 캐릭터 카드 세트 정보')
+    
+    # 카드 세트 이름 / 세트 정보 출력
+    # 세트 정보는 코드 블록 형식으로 출력함
+    for c_set in cardsInfo:
+        _name, _discription = cardExtract(c_set)
+        _discription = '```' + _discription + '```'
+        embed.add_field(name=_name, value=_discription, inline=False)
+    
+    await ctx.send(ctx.author.mention, embed=embed)
+
 bot.run(DISCORD_TOKEN)
 
