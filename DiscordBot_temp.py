@@ -13,6 +13,7 @@ from SearchTools.TroubleSearch import TroubleSearch
 
 from ExtractTools.GemsExtract import gemsExtract
 from ExtractTools.CardExtract import cardExtract
+from ExtractTools.PriceExtract import priceExtract
 
 # 봇이 반응하는 접두사 : '/'
 # 예시) 디스코드 채널 /ping 입력 -> pong 메시지 반환
@@ -180,12 +181,14 @@ async def gems_info_error(ctx, error):
         await ctx.send('올바른 닉네임 형식을 입력해주세요.')
 
 
-@bot.command(aliases=['경매','전각','배분', '분배'])
-async def auc_distribution(ctx, item_name: str) -> None:
+@bot.command(aliases=['전각'])
+async def auc_book_distrib(ctx, item_name: str) -> None:
     """
-    auc_distribution : 전각 분배 계산기
-    예시) !경매 광기 / !전각 고독한 기사
-    결과) 입찰가와 선점입찰가를 embed 형식으로 출력
+    item_name : 전설 각인서 이름
+    예시) !전각 고독한 기사
+    
+    return: 
+    파티 인원 별 입찰가와 선점입찰가를 embed 형식으로 출력
     """
     
     # 아이템 검색 객체 호출
@@ -202,12 +205,9 @@ async def auc_distribution(ctx, item_name: str) -> None:
     except IndexError:
         await ctx.send("존재하지 않는 아이템 입니다.")
     
-    # 4인 및 8인 파티 일반 입찰가와 선점 입찰가
-    bid_4 = recent_price * 0.95 * 3/4
-    preempt_bid_4 = recent_price * 0.95 * 10/11 * 3/4
-    
-    bid_8 = recent_price * 0.95 * 7/8
-    preempt_bid_8 = recent_price * 0.95 * 10/11 * 7/8
+    # 4인 및 8인 파티 일반 입찰가와 선점 입찰가 (priceExtract 메소드 사용)
+    bid_4, preempt_bid_4, bid_8, preempt_bid_8 = \
+        priceExtract(recent_price)
     
     # 디스코드 메시지로 출력할 embed 형식
     embed = discord.Embed(title='',
@@ -231,15 +231,52 @@ async def auc_distribution(ctx, item_name: str) -> None:
     
     await ctx.send(ctx.author.mention, embed=embed)
 
-# 아이템 이름이 누락될 시
-@auc_distribution.error
-async def auc_distribution_error(ctx, error):
+
+# 아이템 이름이 누락될 시 오류
+@auc_book_distrib.error
+async def auc_book_distrib_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(f' {ctx.author.mention} 올바른 아이템 이름 형식을 입력해주세요.')
 
+
+
+@bot.command(aliases=['분배', '배분', '경매'])
+async def auc_gold_distrib(ctx, gold: int):
+    """
+    gold : 골드 값
+    예시) !분배 2030 / !경매 3000
+    
+    return: 
+    파티 인원 별 입찰가와 선점입찰가를 embed 형식으로 출력
+    """
+    bid_4, preempt_bid_4, bid_8, preempt_bid_8 = \
+        priceExtract(gold)
+        
+    embed = discord.Embed(title='',
+                          discription='',
+                          color=0XFFD700)
+    
+    embed.set_author(name='경매 분배금 계산기', icon_url='https://static.loawa.com/icons/gold.png')
+
+    embed.add_field(name='4인 파티',
+                    value=f'입찰가 : {bid_4:.0f}\n선점입찰가 : {preempt_bid_4:.0f}\n\n\n\n', inline=False)
+    embed.add_field(name='8인 파티',
+                    value=f'입찰가 : {bid_8:.0f}\n선점입찰가 : {preempt_bid_8:.0f}')
+    
+    
+    await ctx.send(ctx.author.mention, embed=embed)
+
+
+
+
 @bot.command(aliases=['사사게', '사고', '사건'])
 async def trouble_info(ctx, char_name):
-    # 사사게 검색 클래스 호출 후 결과 탐색
+    """
+    char_name : 캐릭터 이름
+    
+    return:
+    사건사고 게시판에 저장된 게시글 이름과 하이퍼링크 
+    """
     trouble_search = TroubleSearch(char_name)
     troubleInfo = trouble_search.searchTrouble()
     
