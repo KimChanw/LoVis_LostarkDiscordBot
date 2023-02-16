@@ -1,5 +1,4 @@
 # DiscordBot_temp.py : 디스코드 봇 명령어 모음 / 봇 네이밍 후 파일명 변경
-
 import SearchTools.config as config
 import discord
 import discord.message
@@ -10,10 +9,13 @@ from SearchTools.classIcon import classIcon as classIcon
 from SearchTools.CharInfoSearch import CharInfoSearch
 from SearchTools.ItemInfoSearch import ItemInfoSearch
 from SearchTools.TroubleSearch import TroubleSearch
+from SearchTools.WeeklyContentsSearch import weeklyContentsSearch
 
 from ExtractTools.GemsExtract import gemsExtract
 from ExtractTools.CardExtract import cardExtract
 from ExtractTools.PriceExtract import priceExtract
+
+from EctTools.ImageConcat import imageConcat
 
 # 봇이 반응하는 접두사 : '/'
 # 예시) 디스코드 채널 /ping 입력 -> pong 메시지 반환
@@ -61,6 +63,8 @@ async def char_info_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send('올바른 닉네임 형식을 입력해주세요.')
 
+
+
 @bot.command(aliases=['각인'])
 async def engrav_info(ctx, char_name):
     search = CharInfoSearch(char_name)
@@ -83,6 +87,8 @@ async def engrav_info(ctx, char_name):
 async def engrav_info_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send('올바른 닉네임 형식을 입력해주세요.')
+
+
 
 #### 캐릭터 배럭
 @bot.command(aliases=['배럭', '부캐'])
@@ -125,6 +131,8 @@ async def siblings_info(ctx, char_name):
 async def sibilings_info_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send('올바른 닉네임 형식을 입력해주세요.')
+
+
 
 #### 캐릭터 착용 보석
 @bot.command(aliases=['보석'])
@@ -181,6 +189,8 @@ async def gems_info_error(ctx, error):
         await ctx.send('올바른 닉네임 형식을 입력해주세요.')
 
 
+
+
 @bot.command(aliases=['전각'])
 async def auc_book_distrib(ctx, item_name: str) -> None:
     """
@@ -211,7 +221,7 @@ async def auc_book_distrib(ctx, item_name: str) -> None:
     
     # 디스코드 메시지로 출력할 embed 형식
     embed = discord.Embed(title='',
-                          discription='',
+                          description='',
                           color=0XFFD700)
     
     embed.set_author(name='전각 분배금 계산기', icon_url=image_url)
@@ -253,10 +263,10 @@ async def auc_gold_distrib(ctx, gold: int):
         priceExtract(gold)
         
     embed = discord.Embed(title='',
-                          discription='',
+                          description='',
                           color=0XFFD700)
     
-    embed.set_author(name='경매 분배금 계산기', icon_url='https://static.loawa.com/icons/gold.png')
+    embed.set_author(name='경매 분배금 계산기', icon_url='https://cdn-lostark.game.onstove.com/EFUI_IconAtlas/Money/Money_4.png')
 
     embed.add_field(name='4인 파티',
                     value=f'입찰가 : {bid_4:.0f}\n선점입찰가 : {preempt_bid_4:.0f}\n\n\n\n', inline=False)
@@ -280,7 +290,7 @@ async def trouble_info(ctx, char_name):
     trouble_search = TroubleSearch(char_name)
     troubleInfo = trouble_search.searchTrouble()
     
-    embed = discord.Embed(title=f':exclamation: 사사게 검색 결과 - {char_name}', discription='')
+    embed = discord.Embed(title=f':exclamation: 사사게 검색 결과 - {char_name}', description='')
     
     # 인덱스와 검색 결과 같이 출력
     for idx, (url, title) in enumerate(troubleInfo):
@@ -289,8 +299,17 @@ async def trouble_info(ctx, char_name):
     
     await ctx.send(ctx.author.mention, embed=embed)
 
+
+
+
 @bot.command(aliases=['카드'])
 async def cards_info(ctx, char_name):
+    """
+    char_name : 캐릭터 이름
+    
+    return:
+    캐릭터가 장착 중인 카드 세트 이름과 효과 정보
+    """
     cards_search = CharInfoSearch(char_name)
     cardsInfo = cards_search.cardInfo()
     
@@ -298,17 +317,48 @@ async def cards_info(ctx, char_name):
         await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
         return
     
-    embed = discord.Embed(title='', discription='')
+    embed = discord.Embed(title='', description='')
     embed.set_author(name=f'{char_name} 캐릭터 카드 세트 정보')
     
     # 카드 세트 이름 / 세트 정보 출력
     # 세트 정보는 코드 블록 형식으로 출력함
     for c_set in cardsInfo:
-        _name, _discription = cardExtract(c_set)
-        _discription = '```' + _discription + '```'
-        embed.add_field(name=_name, value=_discription, inline=False)
+        _name, _description = cardExtract(c_set)
+        _description = '```' + _description + '```'
+        embed.add_field(name=_name, value=_description, inline=False)
     
     await ctx.send(ctx.author.mention, embed=embed)
 
+
+
+@bot.command(aliases=['주간컨텐츠', '도가토', '도비스'])
+async def weeklyContents_info(ctx):
+    """
+    return:
+    주간 도전 컨텐츠 목록
+    """
+    weekly_contents = weeklyContentsSearch()
+    
+    embed = discord.Embed(title='주간 도전 컨텐츠 목록')
+    
+    # 던전 리스트, 이미지 url
+    sub_abyss, abyss_img_url = \
+        weekly_contents.abyssInfo()
+    
+    # 가디언 토벌 리스트
+    guardian_list, guardian_image_url = weekly_contents.guardianInfo()
+        
+    total_img = abyss_img_url + guardian_image_url
+    
+    # contents_img = imageConcat(total_img)
+    
+    abyss_description = '\n'.join(sub_abyss)
+    embed.add_field(name='도전 어비스 던전', value=abyss_description, inline=False)
+    
+    guardian_descrition = '\n'.join(guardian_list)
+    embed.add_field(name='도전 가디언 토벌', value=guardian_descrition)
+    
+    await ctx.send(ctx.author.mention, embed=embed)
+    
 bot.run(DISCORD_TOKEN)
 
