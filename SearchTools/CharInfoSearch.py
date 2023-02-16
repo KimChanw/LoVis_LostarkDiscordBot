@@ -14,28 +14,18 @@ class CharInfoSearch(InfoBaseLine):
     def __init__(self, char_name):
         self.char_name = char_name
     
-    # private 메소드
-    # get 메소드로 호출하는 api
-    def __getinfo(self, url):
-        # requests 라이브러리로 get
-        res = requests.get(url, headers=CharInfoSearch.HEADERS)
-        # json 포맷으로 변환
-        json_res = res.json()
-        
-        return json_res
-    
     # 단일 캐릭터 정보 검색
     def charInfo(self):
         # api 엔드포인트
-        url = CharInfoSearch.BASIC_URL + f'/armories/characters/{self.char_name}/profiles'
-        json_res = self.__getinfo(url)
+        url = InfoBaseLine.BASIC_URL + f'/armories/characters/{self.char_name}/profiles'
+        json_res = self._getinfo(url)
         
         return json_res
     
     def siblingsInfo(self):
         # api로 호출
-        url = CharInfoSearch.BASIC_URL + f'/characters/{self.char_name}/siblings'
-        json_res = self.__getinfo(url)
+        url = InfoBaseLine.BASIC_URL + f'/characters/{self.char_name}/siblings'
+        json_res = self._getinfo(url)
         
         # 캐릭터 아이템 레벨 기준 json 정렬
         # 레벨 형식 : 1,470.00 -> 문자열로 저장되어 있으므로 float 전환
@@ -52,8 +42,8 @@ class CharInfoSearch(InfoBaseLine):
     
     # 착용 각인 정보
     def engravInfo(self):
-        url = CharInfoSearch.BASIC_URL + f'/armories/characters/{self.char_name}/engravings'
-        json_res = self.__getinfo(url)
+        url = InfoBaseLine.BASIC_URL + f'/armories/characters/{self.char_name}/engravings'
+        json_res = self._getinfo(url)
         
         try:
             return json_res['Effects']
@@ -64,8 +54,8 @@ class CharInfoSearch(InfoBaseLine):
     # 보석 착용 정보
     def gemsInfo(self):
         
-        url = CharInfoSearch.BASIC_URL + f'/armories/characters/{self.char_name}/gems'
-        json_res = self.__getinfo(url)
+        url = InfoBaseLine.BASIC_URL + f'/armories/characters/{self.char_name}/gems'
+        json_res = self._getinfo(url)
         
         try:
             return json_res['Gems']
@@ -74,8 +64,8 @@ class CharInfoSearch(InfoBaseLine):
             return
     
     def cardInfo(self):
-        url = CharInfoSearch.BASIC_URL + f'/armories/characters/{self.char_name}/cards'
-        json_res = self.__getinfo(url)
+        url = InfoBaseLine.BASIC_URL + f'/armories/characters/{self.char_name}/cards'
+        json_res = self._getinfo(url)
         
         try:
             return json_res['Effects'][0]['Items']

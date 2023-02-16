@@ -1,3 +1,4 @@
+import requests
 import SearchTools.config as config
 
 class InfoBaseLine:
@@ -14,3 +15,13 @@ class InfoBaseLine:
         'accept' : 'application/json',
         'authorization' : f'bearer {__LOSTARK_API}'
     }
+    
+    # private 메소드
+    # get 메소드로 호출하는 api
+    def _getinfo(self, url):
+        # requests 라이브러리로 get
+        res = requests.get(url, headers=InfoBaseLine.HEADERS)
+        # json 포맷으로 변환
+        json_res = res.json()
+        
+        return json_res
