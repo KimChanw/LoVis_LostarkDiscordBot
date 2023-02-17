@@ -2,33 +2,47 @@ import requests
 from bs4 import BeautifulSoup
 
 class TroubleSearch:
-    def __init__(self, char_name):
-        self.char_name = char_name
+    def __init__(self, search_kw):
+        self.search_kw = search_kw
         
-    def searchTrouble(self):
-        # 페이로드로 검색 대상 닉네임 전송
-        url = 'https://api.sasagefind.ga/sasagefind'
-        payload = {
-            'charname' : self.char_name,
-            'type' : 'titlecontent'
-        }
-        site_html = requests.post(url, data=payload)
-
-        result_json = site_html.json()
+    def _check_result(self, bs_object):
+        # 검색 결과 여부 확인
+        # 최근 1만개 이내 검색
         
-        # 이터레이터 생성, 순회
-        trouble_text_iter = self._extract_idx_title(result_json)
+        no_result = bs_object.find_all(
+            'div', {'class' : 'no-result'}
+        )
         
-        # yield할 게시글 주소와 제목
-        for idx, title in trouble_text_iter:
-            trouble_url = f'https://www.inven.co.kr/board/lostark/5355/{idx}'
-            
-            yield trouble_url, title
+        if no_result:
+            return False
+        
+        return True
     
-    # 게시글 번호와 제목 이터레이터
-    def _extract_idx_title(self, result_json):
-        for trouble_result in result_json:
-            _idx = trouble_result['idx']
-            _title = trouble_result['title']
+    def searchTrouble(self):
+        base_url = f'https://www.inven.co.kr/board/lostark/5355?query=list&p=1&sterm=&name=subject&keyword={self.search_kw}'
+        req = requests.get(base_url)
+        
+        bs = BeautifulSoup(req.text, 'html.parser')
+        
+        post_url_list = []
+        title_list = []
+        
+        if self._check_result(bs):
+            post_result_list = bs.find_all(
+                'a', {'class' : "subject-link"}
+            )
+
+            # 공지글 제거
+            post_result_list = post_result_list[1:]
             
-            yield _idx, _title
+            for result in post_result_list:
+                post = result.attrs['href']
+                
+                # 게시글 이름 재구성
+                title = result.text.split()
+                title = ' '.join(title)
+
+                post_url_list.append(post)
+                title_list.append(title)
+                
+        return post_url_list, title_list
