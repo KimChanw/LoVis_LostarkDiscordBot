@@ -285,15 +285,22 @@ async def trouble_info(ctx, char_name):
     char_name : 캐릭터 이름
     
     return:
-    사건사고 게시판에 저장된 게시글 이름과 하이퍼링크 
+    최근 1만개 게시글 중 올라온 사건사고 게시글 이름과 하이퍼링크 
     """
     trouble_search = TroubleSearch(char_name)
-    troubleInfo = trouble_search.searchTrouble()
-    
-    embed = discord.Embed(title=f':exclamation: 사사게 검색 결과 - {char_name}', description='')
+    trouble_post, trouble_title = trouble_search.searchTrouble()
+        
+    embed = discord.Embed(title=f':exclamation: 사사게 검색 결과 - {char_name}', 
+                          description='''부캐명이 포함되지 않을 수 있다는 점 참고 부탁드립니다!
+                                         최근 1만개의 게시글 내에서 검색합니다.''')
+
+    if len(trouble_post) == 0 and len(trouble_title) == 0:
+        embed.add_field(name='', value='*검색 결과가 없습니다!*')
+        await ctx.send(ctx.author.mention, embed=embed)
+        return
     
     # 인덱스와 검색 결과 같이 출력
-    for idx, (url, title) in enumerate(troubleInfo):
+    for idx, (url, title) in enumerate(zip(trouble_post, trouble_title)):
         idx += 1
         embed.add_field(name='', value=f'{idx}. [{title}](<{url}>)', inline=False)
     
