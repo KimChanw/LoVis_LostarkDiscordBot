@@ -14,6 +14,7 @@ from SearchTools.WeeklyContentsSearch import weeklyContentsSearch
 from ExtractTools.GemsExtract import gemsExtract
 from ExtractTools.CardExtract import cardExtract
 from ExtractTools.PriceExtract import priceExtract
+from ExtractTools.DescriptionExtract import descriptionExtract
 
 from EctTools.ImageConcat import imageConcat
 
@@ -41,19 +42,45 @@ async def char_info(ctx, char_name: str) -> None:
     """
     char_info : 단일 캐릭터 정보를 반환하는 커맨드
     예시) /정보 문학학사공학석사 / /캐릭터 문학학사공학석사
-    결과) 
+    
+    return:
+    캐릭터 정보 출력 임베드
     """
     
     # 캐릭터 검색 객체 호출 -> 개별 캐릭터를 검색하는 메소드 (charInfo)
     search = CharInfoSearch(char_name)
-    charInfo = search.charInfo()
     
-    class_name = charInfo['CharacterClassName']
+    # 캐릭터 정보 / 레벨 정보 / 특성 정보 / 공격력 및 체력 / 썸네일 url
+    char_profile, char_lev_info, char_spec_info, attack_hp, tendencies, thumnail = \
+                                        search.charInfo()
     
-    embed = discord.Embed(title='', color=0XFFD700)
+    
+    class_name = char_profile['직업']
+    # 캐릭터 정보 description
+    profile_des = descriptionExtract(char_profile)
+    char_lev_des = descriptionExtract(char_lev_info)
+    attack_hp_des = descriptionExtract(attack_hp)
+    char_spec_des = descriptionExtract(char_spec_info)
+    tendencies_des = descriptionExtract(tendencies)
+    
+    embed = discord.Embed(title='')
     embed.set_author(name=f'{char_name}', icon_url=classIcon[class_name])
     
-    embed.add_field(name='정보', value='그냥')
+    embed.set_thumbnail(url=thumnail)
+    
+    embed.add_field(name='캐릭터 정보', value=profile_des, inline=True)
+    embed.add_field(name='', value='\t\t', inline=True)
+    embed.add_field(name='레벨', value=char_lev_des)
+    
+    embed.add_field(name='', value='\n\n', inline=False)
+    embed.add_field(name='성향', value=tendencies_des, inline=True)
+    
+    # embed.add_field(name='', value=char_spec_des, inline=False)
+
+    embed.add_field(name='', value='\t\t', inline=True)
+    embed.add_field(name='특성', 
+                    value=attack_hp_des+'\n'+char_spec_des, 
+                    inline=True)
     
     await ctx.send(ctx.author.mention, embed=embed)
     
@@ -74,12 +101,15 @@ async def engrav_info(ctx, char_name):
         await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
         return
 
-    embed = discord.Embed(title=f'{char_name} 캐릭터의 장착 각인', color=0XFFD700)
+    embed = discord.Embed(title=f'장착 각인 - {char_name}')
+    
+    _engrav_name = ''
     
     # 장착한 각인 데이터 순회 -> 각인 이름 출력
     for idx in range(len(engInfo)):
-        _engrav_name = engInfo[idx]['Name']
-        embed.add_field(name='', value=f'{_engrav_name}', inline=False)
+        _engrav_name += engInfo[idx]['Name'] + '\n'
+    
+    embed.add_field(name='', value=_engrav_name, inline=False)
     
     await ctx.send(ctx.author.mention, embed=embed)
 
@@ -106,8 +136,7 @@ async def siblings_info(ctx, char_name):
         await ctx.send(f'{ctx.author.mention} 존재하지 않는 닉네임 입니다.')
         return
     
-    embed = discord.Embed(title=f'{char_name} 캐릭터 배럭 목록',
-                          color=0XFFD700)
+    embed = discord.Embed(title=f'배럭 목록 - {char_name}')
     
     embed.add_field(name='캐릭터명', value='', inline=True)
     embed.add_field(name='직업', value='', inline=True)
@@ -150,13 +179,13 @@ async def gems_info(ctx, char_name):
         return
     
     embed = discord.Embed(title='')
-    embed.set_author(name=f'{char_name} 캐릭터 보석 정보', 
+    embed.set_author(name=f'보석 정보 - {char_name}', 
                      icon_url='https://cdn-lostark.game.onstove.com/EFUI_IconAtlas/Use/Use_9_55.png')
     
     
     # 코드 블록 형태로 출력
-    gem_messages = """```"""
-    skill_messages = """```"""
+    gem_messages = ''
+    skill_messages = ''
     
     # 보석 레벨 순 정렬 위해 리스트에 추가
     gem_info_list = []
@@ -170,15 +199,13 @@ async def gems_info(ctx, char_name):
     
     # 코드 블록에 출력 메시지 추가
     for gem_info in gem_info_list:
-        gem_messages += gem_info[0] + '\n\n'
+        gem_color = f':{gem_info[3]}_square: ' # 이모지 형식으로 전환 (예시 - :green_square:)
+        gem_messages += gem_color + gem_info[0] + '\n\n'
         skill_messages += gem_info[1] + '\n\n'
-    
-    # 코드 블록 close
-    gem_messages += '```'
-    skill_messages += '```'
     
     # 코드 블록으로 embed 출력
     embed.add_field(name='보석', value=gem_messages, inline=True)
+    embed.add_field(name='', value='\t', inline=True)
     embed.add_field(name='스킬', value=skill_messages, inline=True)
     
     await ctx.send(ctx.author.mention, embed=embed)
@@ -263,8 +290,7 @@ async def auc_gold_distrib(ctx, gold: int):
         priceExtract(gold)
         
     embed = discord.Embed(title='',
-                          description='',
-                          color=0XFFD700)
+                          description='')
     
     embed.set_author(name='경매 분배금 계산기', icon_url='https://cdn-lostark.game.onstove.com/EFUI_IconAtlas/Money/Money_4.png')
 
