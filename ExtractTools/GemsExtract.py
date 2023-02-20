@@ -1,5 +1,12 @@
 import re
-    
+
+# 보석 등급과 이모지 매핑
+color_map = {'고급': 'green',
+             '희귀': 'blue',
+             '영웅': 'purple',
+             '전설': 'yellow',
+             '유물': 'orange'}
+
 def gemsExtract(gems_json):
     """
     gems_json : api로 받은 보석 json 데이터
@@ -7,7 +14,9 @@ def gemsExtract(gems_json):
     return : 
     보석 이름 / 보석 적용 스킬명 / 스킬명 dict가 저장된 튜플
     """
-
+    # 보석 색
+    gem_grade = gems_json['Grade']
+    gem_color = color_map[gem_grade]
     # 추출 과정 : RegEx를 이용하여 pattern 정의 -> 문자열에서 matching
     # 보석 이름 추출 -> gems_json 데이터 "Name" 데이터 사용
     name_pattern = re.compile('(?<=<FONT COLOR=\'.{7}\'>).+(?=<\/FONT>)')
@@ -32,4 +41,4 @@ def gemsExtract(gems_json):
     lv_search_result = lv_pattern.search(gem_name)
     lv = int(lv_search_result.group())  # str -> int
     
-    return gem_name, gem_skill, lv
+    return gem_name, gem_skill, lv, gem_color
