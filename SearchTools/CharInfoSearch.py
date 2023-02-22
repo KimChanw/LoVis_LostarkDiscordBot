@@ -20,7 +20,48 @@ class CharInfoSearch(InfoBaseLine):
         url = InfoBaseLine.BASIC_URL + f'/armories/characters/{self.char_name}/profiles'
         json_res = self._getinfo(url)
         
-        return json_res
+        # 출력 정보 전처리
+        char_profile = {
+            '서버' : json_res['ServerName'],
+            '직업' : json_res['CharacterClassName'],
+            '길드' : json_res['GuildName'],
+            '칭호' : json_res['Title'],
+            'PvP' : json_res['PvpGradeName'],
+            '영지' : f"Lv.{json_res['TownLevel']} { json_res['TownName']}",
+            '스포' : json_res['TotalSkillPoint']
+        }
+        
+        # 레벨 정보
+        char_lev_info = {
+            '원정대 레벨' : json_res['ExpeditionLevel'],
+            '전투 레벨' : json_res['CharacterLevel'],
+            '아이템 레벨' : json_res['ItemAvgLevel']
+        }
+        
+        # 공격력 / 최대 생명력 추가
+        attack_hp = {}
+        
+        attack_hp['공격력'] = json_res['Stats'][7]['Value']
+        attack_hp['최대 생명력'] = json_res['Stats'][6]['Value']
+        
+        # 특성 추가
+        char_spec_info = {}
+        for idx in range(6):
+            stat_name = json_res['Stats'][idx]['Type']
+            stat_val = json_res['Stats'][idx]['Value']
+            char_spec_info[stat_name] = stat_val
+        
+        # 성향 포인트
+        tendencies = {}
+        for idx in range(len(json_res['Tendencies'])):
+            name = json_res['Tendencies'][idx]['Type']
+            val = json_res['Tendencies'][idx]['Point']
+            tendencies[name] = val
+        
+        
+        thumnail = json_res['CharacterImage']
+                
+        return char_profile, char_lev_info, char_spec_info, attack_hp, tendencies, thumnail
     
     def siblingsInfo(self):
         # api로 호출
@@ -70,6 +111,31 @@ class CharInfoSearch(InfoBaseLine):
         try:
             return json_res['Effects'][0]['Items']
 
-        except:
+        except AttributeError:
             return
 
+    def equipmentInfo(self):
+        url = InfoBaseLine.BASIC_URL + f'/armories/characters/{self.char_name}/equipment'
+        json_res = self._getinfo(url)
+        
+        if json_res == 'null':
+            return None, None
+        
+        # 장비 / 악세 별 json 결과 분류
+        eqip_class = []
+        acc_class = []
+        
+        eqip_list = ['무기', '투구', '상의', '하의', '장갑', '어깨']
+        acc_list = ['목걸이', '귀걸이', '반지', '어빌리티 스톤', '팔찌']
+        
+        for data in json_res:
+            if data["Type"] in eqip_list:
+                eqip_class.append(data)
+            
+            elif data["Type"] in acc_list:
+                acc_class.append(data)
+    
+    
+        # 장비 / 악세서리 정보 분리하여 반환
+        return eqip_class, acc_class
+    
