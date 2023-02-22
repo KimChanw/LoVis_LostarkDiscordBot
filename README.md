@@ -14,7 +14,7 @@
 
 
 ## LoVis의 기능
-[로비스 명령어 모음](https://www.notion.so/LoVis-7f6bd950122147b08ec97ca88725ae36)
+[로비스 명령어 모음](https://www.notion.so/LoVis-c00314d9cef04a049bfa880513009496)
 
 <br>
     
