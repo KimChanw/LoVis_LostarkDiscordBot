@@ -1,1 +1,2 @@
-from .DescriptionTool import descriptionTool
+from .ProfileDescription import profileDescription
+from .EquipmentDescription import equipmentDescription
