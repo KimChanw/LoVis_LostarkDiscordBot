@@ -1,22 +1,16 @@
 # DiscordBot_temp.py : 디스코드 봇 명령어 모음 / 봇 네이밍 후 파일명 변경
-import SearchTools.config as config
+
 import discord
 import discord.message
 
 from discord.ext import commands
 
-from SearchTools.classIcon import classIcon as classIcon
-from SearchTools.CharInfoSearch import CharInfoSearch
-from SearchTools.ItemInfoSearch import ItemInfoSearch
-from SearchTools.TroubleSearch import TroubleSearch
-from SearchTools.WeeklyContentsSearch import weeklyContentsSearch
+from SearchTools import *
+from SearchTools import config
 
-from ExtractTools.GemsExtract import gemsExtract
-from ExtractTools.CardExtract import cardExtract
-from ExtractTools.PriceExtract import priceExtract
-from ExtractTools.DescriptionExtract import descriptionExtract
+from ExtractTools import *
 
-from EctTools.ImageConcat import imageConcat
+from EctTools import *
 
 # 봇이 반응하는 접두사 : '/'
 # 예시) 디스코드 채널 /ping 입력 -> pong 메시지 반환
@@ -57,11 +51,11 @@ async def char_info(ctx, char_name: str) -> None:
     
     class_name = char_profile['직업']
     # 캐릭터 정보 description
-    profile_des = descriptionExtract(char_profile)
-    char_lev_des = descriptionExtract(char_lev_info)
-    attack_hp_des = descriptionExtract(attack_hp)
-    char_spec_des = descriptionExtract(char_spec_info)
-    tendencies_des = descriptionExtract(tendencies)
+    profile_des = profileDescription(char_profile)
+    char_lev_des = profileDescription(char_lev_info)
+    attack_hp_des = profileDescription(attack_hp)
+    char_spec_des = profileDescription(char_spec_info)
+    tendencies_des = profileDescription(tendencies)
     
     embed = discord.Embed(title='')
     embed.set_author(name=f'{char_name}', icon_url=classIcon[class_name])
@@ -92,6 +86,29 @@ async def char_info_error(ctx, error):
 
 
 
+@bot.command(aliases=['장비'])
+async def equipment_info(ctx, char_name):
+    equipment_search = CharInfoSearch(char_name)
+    equipment_info, acc_info = equipment_search.equipmentInfo()
+    
+    if equipment_info == None and acc_info == None:
+        await ctx.send('착용 장비가 없습니다.')
+        return
+    
+    embed = discord.Embed(title='')
+    embed.set_author(name=f'착용 장비 - {char_name}', icon_url='https://cdn-lostark.game.onstove.com/EFUI_IconAtlas/Shop_icon/Shop_icon_1445.png')
+    
+    # 제너레이터에서 값 꺼내오기
+    for equip_iter in equipmentExtract(equipment_info):
+        description = equipmentDescription(*equip_iter)
+
+        embed.add_field(name='', value=description, inline=False)
+    
+    await ctx.send(ctx.author.mention, embed=embed)
+    
+    
+    
+    
 @bot.command(aliases=['각인'])
 async def engrav_info(ctx, char_name):
     search = CharInfoSearch(char_name)
@@ -380,9 +397,7 @@ async def weeklyContents_info(ctx):
     
     # 가디언 토벌 리스트
     guardian_list, guardian_image_url = weekly_contents.guardianInfo()
-        
-    total_img = abyss_img_url + guardian_image_url
-    
+            
     # contents_img = imageConcat(total_img)
     
     abyss_description = '\n'.join(sub_abyss)

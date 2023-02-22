@@ -111,6 +111,31 @@ class CharInfoSearch(InfoBaseLine):
         try:
             return json_res['Effects'][0]['Items']
 
-        except:
+        except AttributeError:
             return
 
+    def equipmentInfo(self):
+        url = InfoBaseLine.BASIC_URL + f'/armories/characters/{self.char_name}/equipment'
+        json_res = self._getinfo(url)
+        
+        if json_res == 'null':
+            return None, None
+        
+        # 장비 / 악세 별 json 결과 분류
+        eqip_class = []
+        acc_class = []
+        
+        eqip_list = ['무기', '투구', '상의', '하의', '장갑', '어깨']
+        acc_list = ['목걸이', '귀걸이', '반지', '어빌리티 스톤', '팔찌']
+        
+        for data in json_res:
+            if data["Type"] in eqip_list:
+                eqip_class.append(data)
+            
+            elif data["Type"] in acc_list:
+                acc_class.append(data)
+    
+    
+        # 장비 / 악세서리 정보 분리하여 반환
+        return eqip_class, acc_class
+    
