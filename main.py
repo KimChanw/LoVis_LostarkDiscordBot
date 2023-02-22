@@ -1,5 +1,7 @@
 # DiscordBot_temp.py : 디스코드 봇 명령어 모음 / 봇 네이밍 후 파일명 변경
 
+from datetime import datetime
+
 import discord
 import discord.message
 
@@ -16,14 +18,15 @@ from EctTools import *
 # 예시) 디스코드 채널 /ping 입력 -> pong 메시지 반환
 bot = commands.Bot(command_prefix='/')
 
-# 디스코드 봇 개발 API
+# 디스코드 봇 개발 API 코드
 DISCORD_TOKEN = config.discord_api
 
 # 봇이 작동되면 온라인으로 상태 전환
 @bot.event
 async def on_ready():
     print('Done!')
-    await bot.change_presence(status=discord.Status.online, activity=None)
+    await bot.change_presence(status=discord.Status.online, 
+                              activity=discord.Game(name='명령어 모음은 /lovis_help'))
 
 # 테스트 명령어
 @bot.command()
@@ -34,12 +37,14 @@ async def ping(ctx):
 @bot.command(aliases=['정보','캐릭터','캐릭', '인포'])
 async def char_info(ctx, char_name: str) -> None:
     """
-    char_info : 단일 캐릭터 정보를 반환하는 커맨드
-    예시) /정보 문학학사공학석사 / /캐릭터 문학학사공학석사
+    char_name : 캐릭터 이름
     
     return:
     캐릭터 정보 출력 임베드
     """
+    # 클라이언트에서 호출한 메소드 및 실행 시간 로그 (메소드 이름과 실행 시간만 출력)
+    # 추후 로그 DB 만들어 insert 예정
+    print(ctx.command, toNowTime())
     
     # 캐릭터 검색 객체 호출 -> 개별 캐릭터를 검색하는 메소드 (charInfo)
     search = CharInfoSearch(char_name)
@@ -88,6 +93,14 @@ async def char_info_error(ctx, error):
 
 @bot.command(aliases=['장비'])
 async def equipment_info(ctx, char_name):
+    """
+    char_name : 캐릭터 이름
+    
+    return:
+    캐릭터가 착용하는 장비 상세 사항 임베드 메시지
+    """
+    print(ctx.command, toNowTime())
+    
     equipment_search = CharInfoSearch(char_name)
     equipment_info, acc_info = equipment_search.equipmentInfo()
     
@@ -111,6 +124,12 @@ async def equipment_info(ctx, char_name):
     
 @bot.command(aliases=['각인'])
 async def engrav_info(ctx, char_name):
+    """
+    return:
+    캐릭터가 장착 중인 각인 정보
+    """
+    print(ctx.command, toNowTime())
+    
     search = CharInfoSearch(char_name)
     engInfo = search.engravInfo()
     
@@ -141,10 +160,11 @@ async def engrav_info_error(ctx, error):
 @bot.command(aliases=['배럭', '부캐'])
 async def siblings_info(ctx, char_name):
     """
-    siblings_info : 해당 캐릭터를 포함한 배럭 리스트
-    예시) /배럭 문학학사공학석사
-    결과) 문학학사공학석사 계정에 생성된 캐릭터를 레벨 순으로 출력
+    return: 
+    같은 계정에 생성된 캐릭터를 레벨 순으로 최대 6명까지 출력
     """
+    print(ctx.command, toNowTime())
+    
     search = CharInfoSearch(char_name)
     siblingsInfo = search.siblingsInfo()
     
@@ -184,9 +204,10 @@ async def sibilings_info_error(ctx, error):
 @bot.command(aliases=['보석'])
 async def gems_info(ctx, char_name):
     """
-    gems_info : 캐릭터가 장착하고 있는 보석 목록 출력
-    예시) /보석 문학학사공학석사
+    return:
+    캐릭터가 장착 중인 보석 정보 임베드 메시지
     """
+    print(ctx.command, toNowTime())
     
     search = CharInfoSearch(char_name)
     gemsInfo = search.gemsInfo()
@@ -245,6 +266,8 @@ async def auc_book_distrib(ctx, item_name: str) -> None:
     파티 인원 별 입찰가와 선점입찰가를 embed 형식으로 출력
     """
     
+    print(ctx.command, toNowTime())
+    
     # 아이템 검색 객체 호출
     item_search = ItemInfoSearch(item_name)
     itemInfo = item_search.engravingBookPrice()
@@ -283,6 +306,8 @@ async def auc_book_distrib(ctx, item_name: str) -> None:
     embed.add_field(name='8인 파티',
                     value=f'입찰가 : {bid_8:.0f}\n선점입찰가 : {preempt_bid_8:.0f}')
     
+    
+    
     await ctx.send(ctx.author.mention, embed=embed)
 
 
@@ -294,7 +319,7 @@ async def auc_book_distrib_error(ctx, error):
 
 
 
-@bot.command(aliases=['분배', '배분', '경매'])
+@bot.command(aliases=['골드', '분배', '배분', '경매'])
 async def auc_gold_distrib(ctx, gold: int):
     """
     gold : 골드 값
@@ -303,6 +328,9 @@ async def auc_gold_distrib(ctx, gold: int):
     return: 
     파티 인원 별 입찰가와 선점입찰가를 embed 형식으로 출력
     """
+    
+    print(ctx.command, toNowTime())
+    
     bid_4, preempt_bid_4, bid_8, preempt_bid_8 = \
         priceExtract(gold)
         
@@ -330,6 +358,9 @@ async def trouble_info(ctx, char_name):
     return:
     최근 1만개 게시글 중 올라온 사건사고 게시글 이름과 하이퍼링크 
     """
+    
+    print(ctx.command, toNowTime())
+    
     trouble_search = TroubleSearch(char_name)
     trouble_post, trouble_title = trouble_search.searchTrouble()
         
@@ -338,7 +369,7 @@ async def trouble_info(ctx, char_name):
                                          최근 1만개의 게시글 내에서 검색합니다.''')
 
     if len(trouble_post) == 0 and len(trouble_title) == 0:
-        embed.add_field(name='', value='*검색 결과가 없습니다!*')
+        embed.add_field(name='', value='**검색 결과가 없습니다!**')
         await ctx.send(ctx.author.mention, embed=embed)
         return
     
@@ -360,6 +391,8 @@ async def cards_info(ctx, char_name):
     return:
     캐릭터가 장착 중인 카드 세트 이름과 효과 정보
     """
+    print(ctx.command, toNowTime())
+    
     cards_search = CharInfoSearch(char_name)
     cardsInfo = cards_search.cardInfo()
     
@@ -377,6 +410,8 @@ async def cards_info(ctx, char_name):
         _description = '```' + _description + '```'
         embed.add_field(name=_name, value=_description, inline=False)
     
+    print(ctx.command, toNowTime())
+    
     await ctx.send(ctx.author.mention, embed=embed)
 
 
@@ -384,9 +419,13 @@ async def cards_info(ctx, char_name):
 @bot.command(aliases=['주간컨텐츠', '도가토', '도비스'])
 async def weeklyContents_info(ctx):
     """
+    no parameters
+    
     return:
     주간 도전 컨텐츠 목록
     """
+    print(ctx.command, toNowTime())
+    
     weekly_contents = weeklyContentsSearch()
     
     embed = discord.Embed(title='주간 도전 컨텐츠 목록')
@@ -407,6 +446,31 @@ async def weeklyContents_info(ctx):
     embed.add_field(name='도전 가디언 토벌', value=guardian_descrition)
     
     await ctx.send(ctx.author.mention, embed=embed)
+    
+@bot.command()
+async def lovis_help(ctx):
+    embed = discord.Embed(title='로비스 봇 명령어 모음',
+                          description= "제작자 : 문학학사공학석사 @아만" + "\n" + "깃허브 주소 : https://github.com/KimChanw/LoVis_LostarkDiscordBot")
+
+    embed.add_field(name='/정보 [캐릭터 이름]', value='캐릭터의 다양한 정보를 알려줍니다.' + '\n' + '대체 가능 명령어 : `/캐릭터 /캐릭 /인포`', inline=False)
+
+    embed.add_field(name='/장비 [캐릭터 이름]', value='캐릭터가 착용 중인 장비를 알려줍니다. (품질 / 등급 / 아이템 이름 / 아이템 레벨 / 엘릭서 부여)', inline=False)
+    embed.add_field(name='/각인 [캐릭터 이름]', value='캐릭터가 장착 중인 각인 정보를 알려줍니다.')
+    embed.add_field(name='/배럭 [캐릭터 이름]', value='계정 내 배럭 정보를 아이템 레벨 순으로 정렬하여 최대 6개까지 알려줍니다.' + '\n' + '대체 가능 명령어 : `/부캐`', inline=False)
+    embed.add_field(name='/보석 [캐릭터 이름]', value='캐릭터가 장착 중인 보석 정보를 알려줍니다.')
+    embed.add_field(name='/전각 [전설 각인서 이름]', value='전설 각인서의 경매장 최저가를 기준으로 파티 인원 별 경매 분배금을 계산해 줍니다.' + '\n' + 
+                                                            '! 반드시 전설 각인서 이름을 입력해 주세요.' + '\n' + 
+                                                            '! 예시) /전각 처단자, /전각 고독한 기사, /전각 망치 (분노의 망치 검색됨)', inline=False)
+    embed.add_field(name='/골드 [숫자]', value='입력한 골드를 기준으로 파티 인원 별 경매 분배금을 계산해 줍니다.' + '\n' + 
+                                                '대체 가능 명령어 : `/분배 /배분 /경매`', inline=False)
+    embed.add_field(name='/사사게 [캐릭터 이름]', value='로스트아크 인벤 사건사고 게시판에 올라온 게시글을 검색합니다.' + '\n' +
+                                                        '최근 게시된 1만개 내에서 검색하므로 과거의 결과는 나오지 않을 수 있습니다.' + '\n' +
+                                                        '검색 속도 문제로 배럭 캐릭터의 게시글은 검색하지 않습니다.' + '\n' +
+                                                        '대체 가능 명령어 : `/사고 /사건`', inline=False)
+    embed.add_field(name='/카드 [캐릭터 이름]', value='캐릭터가 장착 중인 카드 세트 정보를 출력합니다.', inline=False)
+    embed.add_field(name='/주간컨텐츠', value='이번 주의 도전 가디언 토벌, 도전 어비스 던전 리스트를 알려줍니다.', inline=False)
+    
+    await ctx.send(embed=embed)
     
 bot.run(DISCORD_TOKEN)
 
