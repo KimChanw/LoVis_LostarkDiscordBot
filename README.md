@@ -13,8 +13,12 @@
 
 <BR>
 
+## LoVis 초대 링크
+[LoVis 초대 링크](https://discord.com/api/oauth2/authorize?client_id=1070983193467031592&permissions=2147510272&scope=bot)
 
-## LoVis의 기능
+<BR>
+
+## LoVis의 명령어
 [로비스 명령어 모음](https://www.notion.so/LoVis-c00314d9cef04a049bfa880513009496)
 
 <br>
@@ -32,3 +36,4 @@
 ## 제작자
  - 문학학사공학석사 @아만
  - 디스코드 : 김찬우#8477
+ - 문의 : chanwoo0628@gmail.com
