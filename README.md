@@ -9,7 +9,8 @@
 ## 프로젝트 소개
 - 명령어를 이용하여 다양한 로스트아크 플레이 정보를 검색할 수 있습니다.
 - 로스트아크 공식 API와 연동하여 안정된 서비스를 지원합니다.
--
+- slash command를 지원하여 사용법을 쉽게 배울 수 있습니다.
+
 <BR>
 
 
@@ -19,7 +20,7 @@
 <br>
     
 ## 개발 환경
-<img src="https://img.shields.io/badge/Python_3.8-3776AB?style=for-the-badge&logo=Python&logoColor=white"> <img src="https://img.shields.io/badge/discord.py_1.7.3-5865F2?style=for-the-badge&logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/Vscode-007ACC?style=for-the-badge&logo=visual studio code&logoColor=white">
+<img src="https://img.shields.io/badge/Python_3.8-3776AB?style=for-the-badge&logo=Python&logoColor=white"> <img src="https://img.shields.io/badge/discord.py_2.1.1-5865F2?style=for-the-badge&logo=discord&logoColor=white"> <img src="https://img.shields.io/badge/Vscode-007ACC?style=for-the-badge&logo=visual studio code&logoColor=white">
 
 <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=AmazonAWS&logoColor=white">
 
