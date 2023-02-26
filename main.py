@@ -35,7 +35,7 @@ async def on_ready():
         print(e)
         
     await bot.change_presence(status=discord.Status.online, 
-                              activity=discord.Game(name='명령어 모음은 /lovis_help'))
+                              activity=discord.Game(name='테스트 계정입니다.'))
 
 @bot.tree.command(name='정보', description='캐릭터의 다양한 정보를 알려줍니다.')
 @app_commands.describe(char_name = '닉네임')
@@ -213,7 +213,7 @@ async def gems_info(interaction: discord.Interaction, char_name: str):
     gemsInfo = search.gemsInfo()
     
     if gemsInfo == None:
-        await interaction.response.send_message(f'존재하지 않는 닉네임 입니다.')
+        await interaction.response.send_message('보석 장착 정보가 존재하지 않는 닉네임입니다.')
         return
     
     embed = discord.Embed(title='')
