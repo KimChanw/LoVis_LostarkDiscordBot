@@ -35,7 +35,7 @@ async def on_ready():
         print(e)
         
     await bot.change_presence(status=discord.Status.online, 
-                              activity=discord.Game(name='테스트 계정입니다.'))
+                              activity=discord.Game(name='명령어 모음은 /help'))
 
 @bot.tree.command(name='정보', description='캐릭터의 다양한 정보를 알려줍니다.')
 @app_commands.describe(char_name = '닉네임')
