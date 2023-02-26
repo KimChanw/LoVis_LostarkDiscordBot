@@ -27,10 +27,22 @@ def _elixirExtract(tooltip):
     # 부여 정보 텍스트
     grant_text = ''
     
+    
+    # 재련 완료 여부 확인 - 재련이 완료된 장비는 툴팁 텍스트 내 '재련' 키워드가 존재하지 않음
+    # 완료 여부에 따라 탐색할 key를 조정함
+    # 기본 탐색할 key : Element_008
+    
+    element_key = 'Element_008'
+    
+    if '재련' not in tooltip:
+        element_key = 'Element_007'
+        
     # 장비 툴팁 json
     tooltip_json = json.loads(tooltip)
     
-    elixir_grant_info = tooltip_json['Element_008']['value']['Element_000']["contentStr"]
+    # print(tooltip_json)
+    
+    elixir_grant_info = tooltip_json[element_key]['value']['Element_000']["contentStr"]
     
     # 최대 2개까지 부여 가능 / 첫 번째 옵션 Element_000부터 저장
     for i in range(len(elixir_grant_info)):

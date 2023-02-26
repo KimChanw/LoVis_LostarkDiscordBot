@@ -89,7 +89,7 @@ class CharInfoSearch(InfoBaseLine):
         try:
             return json_res['Effects']
         
-        except AttributeError:
+        except TypeError:
             return
     
     # 보석 착용 정보
@@ -101,7 +101,7 @@ class CharInfoSearch(InfoBaseLine):
         try:
             return json_res['Gems']
         
-        except AttributeError:
+        except TypeError:
             return
     
     def cardInfo(self):
@@ -111,7 +111,7 @@ class CharInfoSearch(InfoBaseLine):
         try:
             return json_res['Effects'][0]['Items']
 
-        except AttributeError:
+        except TypeError:
             return
 
     def equipmentInfo(self):
