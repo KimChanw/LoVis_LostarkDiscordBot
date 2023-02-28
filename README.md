@@ -13,7 +13,11 @@
 
 <BR>
 
-## LoVis 초대 링크
+## LoVis 초대 링크    
+[LoVis 초대 링크](https://discord.com/oauth2/authorize?client_id=1070983193467031592&permissions=2147510272&scope=bot)
+<BR>
+
+## LoVis의 명령어
 
 ### /help
 
@@ -66,13 +70,6 @@
 ### /주간컨텐츠
 
 - 이번 주의 도전 가디언 토벌, 도전 어비스 던전 리스트를 알려줍니다.
-    
-    
-    
-<BR>
-
-## LoVis의 명령어
-[로비스 명령어 모음](https://www.notion.so/LoVis-c00314d9cef04a049bfa880513009496)
 
 <br>
     
