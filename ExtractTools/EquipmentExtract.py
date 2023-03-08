@@ -70,6 +70,10 @@ def _accTooltipExtraction(tooltip):
     # 그냥 공백으로 바꿀 시 치명 / +492 / 신속 / +491이 모두 줄바꿈됨
     tooltip = tooltip.replace('<BR>', '*')
     
+    # 각인 정보 마지막에 <BR>이 붙어있으므로 출력 시 [고독한 기사] 활성도 +3* 과 같이 붙어서 나옴
+    # 바로 뒤에 큰따옴표가 붙어있으므로 *"을 replace
+    tooltip = tooltip.replace('*"', '"')
+    
     # 기타 태그 삭제
     tag_pattern = re.compile('(<([^>]+)>)')
     tooltip = tag_pattern.sub('', tooltip)
