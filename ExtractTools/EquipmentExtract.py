@@ -63,7 +63,37 @@ def _elixirExtract(tooltip):
     grant_text = grant_text.strip()
     
     return grant_text
+
+def _accTooltipExtraction(tooltip):
+    # <BR>은 *로 변환, 나머지 태그는 삭제
+    # 목걸이에 붙은 스탯 정보에서 *를 기준으로 split하여 출력
+    # 그냥 공백으로 바꿀 시 치명 / +492 / 신속 / +491이 모두 줄바꿈됨
+    tooltip = tooltip.replace('<BR>', '*')
     
+    # 기타 태그 삭제
+    tag_pattern = re.compile('(<([^>]+)>)')
+    tooltip = tag_pattern.sub('', tooltip)
+        
+    tooltip_json = json.loads(tooltip)
+    
+    
+    acc_tooltip_text = ''
+    
+    # 1. 악세 스탯 정보 삽입
+    acc_stat = tooltip_json['Element_005']['value']['Element_001']
+    
+    # join 메소드로 치명 +492 신속 +491 형식을 치명 +492 \n 신속 +491 으로 줄바꿈함
+    acc_tooltip_text += '\n'.join(acc_stat.split('*')) + '\n'
+    
+    # 2. 악세 각인 정보 삽입
+    indent_group = tooltip_json['Element_006']['value']['Element_000']['contentStr']
+    for i in range(len(indent_group)):
+        content_str = indent_group[f'Element_00{i}']['contentStr']
+        acc_tooltip_text += content_str + '\n'
+        
+    return acc_tooltip_text
+
+
 def equipmentExtract(equip_json):
     """
     equip_json : api로 받은 착용 장비 json 데이터
@@ -92,7 +122,18 @@ def equipmentExtract(equip_json):
         # 엘릭서 부여 정보
         elixir_text = _elixirExtract(equip_json[idx]['Tooltip'])
         
-        yield equip_name, equip_grade, quality, quality_color, equip_lv, elixir_text, equip_type
+        
+        result = {
+            'equip_name' :  equip_name,
+            'equip_grade' : equip_grade,
+            'quality' : quality,
+            'quality_color' : quality_color,
+            'equip_lv' : equip_lv,
+            'elixir_text' : elixir_text,
+            'equip_type' : equip_type
+        }
+        
+        yield result
         
         
         
@@ -104,4 +145,27 @@ def accExtract(acc_json):
     return:
     악세사리 이름, 악세사리 품질, 악세사리 등급, 악세사리 세부 정보 iterator
     """
-    pass
+    quality_pattern = re.compile('(?<=\\"qualityValue\\": )[0-9]+(?=,\\r\\n)')
+
+    for idx in range(len(acc_json)):
+        equip_name = acc_json[idx]['Name']
+        equip_grade = acc_json[idx]['Grade']
+        equip_type = acc_json[idx]['Type']
+        
+        tooltip = acc_json[idx]['Tooltip']
+        
+        quality = quality_pattern.search(tooltip)[0]
+        
+        quality_color = quality_map[int(quality) // 10]
+        
+        acc_tooltip_text = _accTooltipExtraction(tooltip)
+        
+        result = {
+            'equip_name' : equip_name,
+            'equip_grade' : equip_grade,
+            'equip_type' : equip_type,
+            'quality' : quality,
+            'quality_color' : quality_color,
+            'acc_tooltip_text' : acc_tooltip_text
+        }
+        yield result
