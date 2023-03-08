@@ -124,9 +124,12 @@ class CharInfoSearch(InfoBaseLine):
         # 장비 / 악세 별 json 결과 분류
         eqip_class = []
         acc_class = []
+        ect_class = []
+        
         
         eqip_list = ['무기', '투구', '상의', '하의', '장갑', '어깨']
-        acc_list = ['목걸이', '귀걸이', '반지', '어빌리티 스톤', '팔찌']
+        acc_list = ['목걸이', '귀걸이', '반지']
+        ect_list = ['어빌리티 스톤', '팔찌']
         
         for data in json_res:
             if data["Type"] in eqip_list:
@@ -134,8 +137,10 @@ class CharInfoSearch(InfoBaseLine):
             
             elif data["Type"] in acc_list:
                 acc_class.append(data)
-    
+
+            else:
+                ect_class.append(data)
     
         # 장비 / 악세서리 정보 분리하여 반환
-        return eqip_class, acc_class
+        return eqip_class, acc_class, ect_class
     

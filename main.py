@@ -88,13 +88,6 @@ async def char_info(interaction: discord.Interaction, char_name: str) -> None:
     
     await interaction.response.send_message(embed=embed)
     
-# info 커맨드에서 캐릭터 이름이 빠질 시 에러 메시지 반환
-@char_info.error
-async def char_info_error(interaction: discord.Interaction, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        await interaction.response.send_message('올바른 닉네임 형식을 입력해주세요.')
-
-
 
 @bot.tree.command(name='장비', description='착용한 장비 정보를 알려줍니다.')
 @app_commands.describe(char_name = '닉네임')
@@ -108,9 +101,9 @@ async def equipment_info(interaction: discord.Interaction, char_name: str):
     print(interaction.command.name, toNowTime())
     
     equipment_search = CharInfoSearch(char_name)
-    equipment_info, acc_info = equipment_search.equipmentInfo()
+    equipment_info, _, _ = equipment_search.equipmentInfo()
     
-    if equipment_info == None and acc_info == None:
+    if equipment_info == None:
         await interaction.response.send_message('착용 장비가 없습니다.')
         return
     
@@ -119,8 +112,35 @@ async def equipment_info(interaction: discord.Interaction, char_name: str):
     
     # 제너레이터에서 값 꺼내오기
     for equip_iter in equipmentExtract(equipment_info):
-        description = equipmentDescription(*equip_iter)
+        description = equipmentDescription(**equip_iter)
 
+        embed.add_field(name='', value=description, inline=False)
+    
+    await interaction.response.send_message(embed=embed)
+    
+@bot.tree.command(name='악세', description='착용한 악세서리 정보를 알려줍니다.')
+@app_commands.describe(char_name = '닉네임')
+async def accessory_info(interaction: discord.Interaction, char_name: str):
+    """
+    char_name : 캐릭터 이름
+    
+    return:
+    캐릭터가 착용하는 장비 상세 사항 임베드 메시지
+    """
+    
+    acc_search = CharInfoSearch(char_name)
+    _, acc_info, _ = acc_search.equipmentInfo()
+
+    if acc_info == None:
+        await interaction.response.send_message('착용 악세서리가 없습니다.')
+        return
+
+    embed = discord.Embed(title='')
+    embed.set_author(name=f'착용 악세서리 - {char_name}', icon_url='https://cdn-lostark.game.onstove.com/EFUI_IconAtlas/Acc/Acc_212.png')
+    
+    for acc_iter in accExtract(acc_info):
+        description = accDescription(**acc_iter)
+        
         embed.add_field(name='', value=description, inline=False)
     
     await interaction.response.send_message(embed=embed)

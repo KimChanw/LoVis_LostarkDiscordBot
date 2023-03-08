@@ -1,3 +1,3 @@
 from .ProfileDescription import profileDescription
-from .EquipmentDescription import equipmentDescription
+from .EquipmentDescription import *
 from .NowTimeConverter import toNowTime
