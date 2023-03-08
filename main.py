@@ -459,6 +459,8 @@ async def help(interaction: discord.Interaction):
     embed.add_field(name='/정보 [캐릭터 이름]', value='캐릭터의 다양한 정보를 알려줍니다.', inline=False)
 
     embed.add_field(name='/장비 [캐릭터 이름]', value='캐릭터가 착용 중인 장비를 알려줍니다. (품질 / 등급 / 아이템 이름 / 아이템 레벨 / 엘릭서 부여)', inline=False)
+    embed.add_field(name='/악세 [캐릭터 이름]', value='캐릭터가 착용 중인 악세서리를 알려줍니다. (품질 / 등급 / 아이템 이름 / 악세서리 정보)', inline=False)
+    
     embed.add_field(name='/각인 [캐릭터 이름]', value='캐릭터가 장착 중인 각인 정보를 알려줍니다.')
     embed.add_field(name='/배럭 [캐릭터 이름]', value='계정 내 배럭 정보를 아이템 레벨 순으로 정렬하여 최대 6개까지 알려줍니다.', inline=False)
     embed.add_field(name='/보석 [캐릭터 이름]', value='캐릭터가 장착 중인 보석 정보를 알려줍니다.')
