@@ -20,7 +20,7 @@ class InfoBaseLine:
     # get 메소드로 호출하는 api
     def _getinfo(self, url):
         # requests 라이브러리로 get
-        res = requests.get(url, headers=InfoBaseLine.HEADERS)
+        res = requests.get(url, headers=InfoBaseLine.HEADERS, verify=False)
         # json 포맷으로 변환
         json_res = res.json()
         

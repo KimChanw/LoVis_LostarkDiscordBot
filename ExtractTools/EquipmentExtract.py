@@ -71,7 +71,7 @@ def _accTooltipExtraction(tooltip):
     tooltip = tooltip.replace('<BR>', '*')
     
     # 각인 정보 마지막에 <BR>이 붙어있으므로 출력 시 [고독한 기사] 활성도 +3* 과 같이 붙어서 나옴
-    # 바로 뒤에 큰따옴표가 붙어있으므로 *"을 replace
+    # 바로 뒤에 큰따옴표가 붙어있으므로 *"을 "로 replace
     tooltip = tooltip.replace('*"', '"')
     
     # 기타 태그 삭제
@@ -86,7 +86,7 @@ def _accTooltipExtraction(tooltip):
     # 1. 악세 스탯 정보 삽입
     acc_stat = tooltip_json['Element_005']['value']['Element_001']
     
-    # join 메소드로 치명 +492 신속 +491 형식을 치명 +492 \n 신속 +491 으로 줄바꿈함
+    # join 메소드로 치명 +492 신속 +491 형식을 치명 +492 \n 신속 +491 으로 변환하여 줄바꿈 기준으로 split
     acc_tooltip_text += '\n'.join(acc_stat.split('*')) + '\n'
     
     # 2. 악세 각인 정보 삽입

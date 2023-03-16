@@ -32,11 +32,9 @@ multidict==6.0.4
 nest-asyncio 
 numpy 
 openai==0.26.4
-opencv-python==4.7.0.68
 packaging 
 parso 
 pickleshare 
-Pillow==9.3.0
 prompt-toolkit 
 psutil 
 pycparser 
@@ -45,7 +43,7 @@ pymongo==4.3.3
 pyOpenSSL 
 python-dateutil 
 pyzmq 
-requests==2.28.2
+requests
 six 
 soupsieve 
 tornado 
