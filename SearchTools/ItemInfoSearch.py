@@ -28,7 +28,7 @@ class ItemInfoSearch(InfoBaseLine):
                 "SortCondition": "ASC"
                 }
         
-        res = requests.post(url, data=params, headers=ItemInfoSearch.HEADERS)
+        res = requests.post(url, data=params, headers=ItemInfoSearch.HEADERS, verify=False)
         
         return res.json()
         
