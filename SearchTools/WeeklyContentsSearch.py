@@ -17,10 +17,7 @@ class weeklyContentsSearch(InfoBaseLine):
         # 하위 던전
         sub_dungeons = [abyss_info['Name'] for abyss_info in json_res]
         
-        # 이미지 url
-        image_url = json_res[0]['Image']
-        
-        return sub_dungeons, [image_url]
+        return sub_dungeons 
     
     def guardianInfo(self) -> list:
         """
@@ -30,6 +27,5 @@ class weeklyContentsSearch(InfoBaseLine):
         json_res = self._getinfo(self.url_guardian)
         
         raids_name = [weekly_raid['Name'] for weekly_raid in json_res['Raids']]
-        raids_image = [weekly_raid['Image'] for weekly_raid in json_res['Raids']]
         
-        return raids_name, raids_image
+        return raids_name
