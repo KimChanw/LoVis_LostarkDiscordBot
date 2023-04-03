@@ -19,14 +19,15 @@ class Character(commands.Cog):
         return:
         캐릭터 정보 출력 임베드
         """
-        # 클라이언트에서 호출한 메소드 및 실행 시간 로그 (메소드 이름과 실행 시간만 출력)
+        # 클라이언트에서 호출한 명령어 및 실행 시간 로그
         # 추후 로그 DB 만들어 insert 예정
         print(interaction.command.name, toNowTime())
         
         
-        # 캐릭터 검색 객체 호출 -> 개별 캐릭터를 검색하는 메소드 (charInfo)
+        # 캐릭터 검색 객체 호출
         search = CharInfoSearch(char_name)
         
+        # 개별 캐릭터를 검색하는 메소드 (charInfo)
         # 캐릭터 정보 / 레벨 정보 / 특성 정보 / 공격력 및 체력 / 썸네일 url
         char_profile, char_lev_info, char_spec_info, attack_hp, tendencies, thumnail = \
                                             search.charInfo()
@@ -160,7 +161,7 @@ class Character(commands.Cog):
         search = CharInfoSearch(char_name)
         siblingsInfo = search.siblingsInfo()
         
-        # 캐릭터가 존재하지 않을 시 오류 메시지 반환하고 메소드 종료
+        # 캐릭터가 존재하지 않을 시 오류 메시지 반환하고 종료
         if siblingsInfo == None:
             await interaction.response.send_message('존재하지 않는 닉네임 입니다.')
             return

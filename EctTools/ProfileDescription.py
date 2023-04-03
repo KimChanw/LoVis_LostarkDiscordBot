@@ -1,4 +1,4 @@
-# embed에 들어갈 description 작성 메소드
+# embed에 들어갈 description 작성 함수
 # dict -> str
 
 def profileDescription(data: dict):
