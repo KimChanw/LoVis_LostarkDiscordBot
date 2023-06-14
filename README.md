@@ -6,13 +6,9 @@
 <BR>
 
 
-## 업데이트 정보
-<details>
-    <summary> ver. 1.0.1 (23.03.09) </summary>
-    <br>
-        악세서리 정보 조회 명령어 "/악세"가 추가되었습니다!
-</details>
-    
+## 아키텍처 구조
+![lovis_architecture(2)](https://github.com/KimChanw/LoVis_LostarkDiscordBot/assets/50550972/88c749b4-4927-4254-a5c1-54cc557da156)
+
 <BR>
     
 ## 프로젝트 소개
