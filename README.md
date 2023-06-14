@@ -7,7 +7,7 @@
 
 
 ## 아키텍처 구조
-![lovis_architecture(2)](https://github.com/KimChanw/LoVis_LostarkDiscordBot/assets/50550972/88c749b4-4927-4254-a5c1-54cc557da156)
+![discord_bot architecture](https://github.com/KimChanw/LoVis_LostarkDiscordBot/assets/50550972/55bb5670-6680-4577-b40c-e05c1af0391d)
 
 <BR>
     
